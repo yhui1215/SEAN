@@ -21,9 +21,10 @@ class Pix2PixModel(torch.nn.Module):
             else torch.FloatTensor
         self.ByteTensor = torch.cuda.ByteTensor if self.use_gpu() \
             else torch.ByteTensor
-
+        # 0- 밑에있다
         self.netG, self.netD, self.netE = self.initialize_networks(opt)
-
+        
+        #여기는 안해  
         # set loss functions
         if opt.isTrain:
             self.criterionGAN = networks.GANLoss(
@@ -38,6 +39,8 @@ class Pix2PixModel(torch.nn.Module):
     # can't parallelize custom functions, we branch to different
     # routines based on |mode|.
     def forward(self, data, mode):
+        
+        # 1- 밑에있다
         input_semantics, real_image = self.preprocess_input(data)
 
         if mode == 'generator':
@@ -96,7 +99,7 @@ class Pix2PixModel(torch.nn.Module):
     ############################################################################
     # Private helper methods
     ############################################################################
-
+    # 0- 첫번째 
     def initialize_networks(self, opt):
         netG = networks.define_G(opt)
         netD = networks.define_D(opt) if opt.isTrain else None
@@ -112,7 +115,8 @@ class Pix2PixModel(torch.nn.Module):
     # preprocess the input, such as moving the tensors to GPUs and
     # transforming the label map to one-hot encoding
     # |data|: dictionary of the input data
-
+    
+    #1-두번째 
     def preprocess_input(self, data):
         # move to GPU and change data types
         data['label'] = data['label'].long()
@@ -123,16 +127,28 @@ class Pix2PixModel(torch.nn.Module):
 
         # create one-hot label map
         label_map = data['label']
+        
+        print("label_map은",label_map)
         bs, _, h, w = label_map.size()
+        
+        #self.opt.contain_dontcare_label이 뭘까
+        print("self.opt.contain_dontcare_label",self.opt.contain_dontcare_label)
+        
         nc = self.opt.label_nc + 1 if self.opt.contain_dontcare_label \
             else self.opt.label_nc
         input_label = self.FloatTensor(bs, nc, h, w).zero_()
+        print("input_label",input_label)
+        # [[1, 0, 0]] --> [[0, 1], [1, 0], [1, 0]]
         input_semantics = input_label.scatter_(1, label_map, 1.0)
 
         # concatenate instance map if it exists
         if not self.opt.no_instance:
             inst_map = data['instance']
             instance_edge_map = self.get_edges(inst_map)
+            
+            # x = torch.FloatTensor([[1, 2], [3, 4]])    ->>>tensor([[1., 2., 5., 6.],
+            # y = torch.FloatTensor([[5, 6], [7, 8]])               [3., 4., 7., 8.]])
+            
             input_semantics = torch.cat((input_semantics, instance_edge_map), dim=1)
 
         return input_semantics, data['image']
