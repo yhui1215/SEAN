@@ -29,7 +29,7 @@ class BaseOptions():
         parser.add_argument('--norm_E', type=str, default='spectralinstance', help='instance normalization or batch normalization')
         parser.add_argument('--phase', type=str, default='train', help='train, val, test, etc')
 
-        # input/output sizes
+        # input/output sizes!
         parser.add_argument('--batchSize', type=int, default=1, help='input batch size')
         parser.add_argument('--preprocess_mode', type=str, default='scale_width_and_crop', help='scaling and cropping of images at load time.', choices=("resize_and_crop", "crop", "scale_width", "scale_width_and_crop", "scale_shortside", "scale_shortside_and_crop", "fixed", "none"))
         parser.add_argument('--load_size', type=int, default=1024, help='Scale images to this size. The final image will be cropped to --crop_size.')
