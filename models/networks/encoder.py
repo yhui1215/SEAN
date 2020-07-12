@@ -19,6 +19,7 @@ class ConvEncoder(BaseNetwork):
         kw = 3
         pw = int(np.ceil((kw - 1.0) / 2))
         ndf = opt.ngf
+        print("ndf",ndf)
         norm_layer = get_nonspade_norm_layer(opt, opt.norm_E)
         self.layer1 = norm_layer(nn.Conv2d(3, ndf, kw, stride=2, padding=pw))
         self.layer2 = norm_layer(nn.Conv2d(ndf * 1, ndf * 2, kw, stride=2, padding=pw))
@@ -38,7 +39,7 @@ class ConvEncoder(BaseNetwork):
     def forward(self, x):
         if x.size(2) != 256 or x.size(3) != 256:
             x = F.interpolate(x, size=(256, 256), mode='bilinear')
-
+      
         x = self.layer1(x)
         x = self.layer2(self.actvn(x))
         x = self.layer3(self.actvn(x))
@@ -51,5 +52,5 @@ class ConvEncoder(BaseNetwork):
         x = x.view(x.size(0), -1)
         mu = self.fc_mu(x)
         logvar = self.fc_var(x)
-
+         
         return mu, logvar
